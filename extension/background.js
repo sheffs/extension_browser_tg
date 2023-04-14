@@ -1,20 +1,6 @@
-//const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
     let userChannel = '';
     let tg_channel = [];
-    
-    async function getTabId(){
-        var tabId = -1;
-        chrome.tabs.query({currentWindow: true}, function (tabs) {
-            tabs.forEach(async function (tab) {
-                if (tab.url.indexOf('telegram') !== -1) {
-                    //debugger;
-                    tabId = tab.id;
-                }
-            });
-        });
-        return tabId;
-    }
     async function reloadTab(newUrl){
         chrome.tabs.query({currentWindow: true}, function (tabs) {
             tabs.forEach(function (tab) {

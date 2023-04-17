@@ -7,23 +7,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 var channels = "";
 
 function Searchform() {
-  const [isChecked, setIsChecked] = useState(false);
   const [counter, setCounter] = useState(0);
   const [selectedChannels, setSelectedChannels] = useState([]);
-
+  const local_channels = JSON.parse(localStorage.getItem('selectedChannels'))
   let map = new Map(Object.entries(channels));
-
   useEffect(() => {
     const storedValue = localStorage.getItem('selectedChannels');
     if (storedValue !== null) {
         setSelectedChannels(JSON.parse(storedValue));
     }
-
     // Отправка сообщения в фоновую страницу при монтировании компонента
     chrome.runtime.sendMessage({ oper: 'sendMessagePop' }, function (response) { });
-
     let value = '';
-
     // Функция для обработки полученных сообщений
     const handleMessage = ({ oper, my_variable }) => {
       switch (oper) {
@@ -35,11 +30,15 @@ function Searchform() {
           setCounter(counter + 1);
           break;
         }
+        case 'scanComplited': {
+          const channelId  = my_variable;
+          document.getElementById(channelId).click()
+          break;
+        }
         default:
           console.log(channels);
       }
     };
-
     chrome.runtime.onMessage.addListener(handleMessage);
 
     return () => {
@@ -59,13 +58,11 @@ function Searchform() {
           channelId => channelId !== id
         );
       };
-
       setSelectedChannels(updatedSelectedChannels); // Обновляем состояние selectedChannels
       localStorage.setItem('selectedChannels', JSON.stringify(updatedSelectedChannels));
     };
 
   const clickButton = () => {
-    localStorage.setItem('checked', JSON.stringify(selectedChannels));
     chrome.runtime.sendMessage({ oper: 'CheckBox_Channel', listToServer: selectedChannels });
   }
 
@@ -106,5 +103,4 @@ function Searchform() {
       </div>
     );
 }
-
 export default Searchform;

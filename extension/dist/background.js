@@ -66,7 +66,7 @@ chrome.runtime.onMessage.addListener(async ({oper, listToServer}, sendResponse) 
             //     }
             //   };
              // Отправка массива на сервер
-            fetch('http://45.136.51.185:4444/', {
+            fetch('http://localhost:3000/savedMessage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

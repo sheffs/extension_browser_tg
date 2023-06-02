@@ -13,30 +13,14 @@ for (const chatId in parseData) {
 // Отправка сообщения в фоновую страницу
 chrome.runtime.sendMessage({ oper: 'sendMessageBack', listToServer: channels }, function(response) {});
 
+
+
 // Слушатель сообщений поступающих на content.js
-chrome.runtime.onMessage.addListener( ({oper, listToServer}, sendResponse) => {
+chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse) => {
   switch(oper){
     case "Scan" : {
-      // let posts = []
-      // let post = document.getElementsByClassName('text-content clearfix with-meta')
-      // for (let i = 0; i<post.length; i++){
-      //   let text = post[i].innerText
-      //   posts.push(text)
-      // }
-      // console.log(posts)
-      // // Канонизация текста
-      // function cleanText(text) {
-      //   // Удаляем символы переноса строки
-      //   text = text.replace(/\n+/g, ' ');
-      //   // Удаляем лишние пробелы в начале и конце строки
-      //   text = text.trim();
-      //   // Удаляем специальные символы, оставляя пробелы между словами
-      //   text = text.replace(/\s+/g, ' ');
-      //   return text;
-      // }
-      // const cleanedArray = posts.map(text => cleanText(text));
-      // console.log(cleanedArray);
       // Получаем текущую дату
+      
       const currentDate = new Date();
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1; // добавляем 1, так как месяцы в JavaScript начинаются с 0
@@ -46,9 +30,7 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sendResponse) => {
       console.log(currentDateJson);
 
 
-
-
-
+      
 
     const messageDateGroupElements = document.getElementsByClassName('message-date-group');
     //Перебираем все элементы коллекции messageDateGroupElements
@@ -70,17 +52,6 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sendResponse) => {
       for (let i = 0; i<time_post.length; i++){
         console.log(time_post[i].innerText)
       }
-
-
-
-
-
-
-
-
-
-
-
 
     let targetElement = document.querySelector('.message-date-group');
 
@@ -109,21 +80,7 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sendResponse) => {
           }
         }, 5000);
   }
-    // let message_group = document.getElementsByClassName('message-date-group')
-    // let span_value = message_group[0].querySelector('.sticky-date.interactive').innerText
-    // while (span_value == 'Today') {
-    //   message_group.scrollIntoView({ behavior: 'smooth' });
-    //      setTimeout(() => {
-    //     message_group.scrollIntoView({ behavior: 'smooth' });
-    //   }, 5000);
-    // }
-
-
-
-
-
-
-
+    
 
       chrome.runtime.sendMessage({oper: 'Scan_posts', listToServer: cleanedArray},function(response) {})
       setTimeout(()=>{
@@ -132,6 +89,12 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sendResponse) => {
       
       break
     }
+    case "date" : {
+      console.log(listToServer)
+      break;
+    }
+    
     default: {console.log('def')}
   }
+  
 })

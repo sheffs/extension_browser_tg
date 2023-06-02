@@ -1,29 +1,29 @@
 {
   "manifest_version": 3,
-  "name": "Chrome Extention ",
-  "description": "React Chrome Extention",
+  "name": "Chrome Extension",
+  "description": "React Chrome Extension",
   "version": "1",
-  "action":{
-    "default_popup": "popup.html",
-    "default_title": "Open"
+  "action": {
+    "default_popup": "popup.html"
   },
-  "content_scripts": [{
-    "matches": [
-      "<all_urls>"
-    ],
-    "js": ["content.js"],
-    "all_frames": true,
-    "match_about_blank": true
-  }],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": ["content.js"],
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
   "permissions": [
     "activeTab",
     "scripting",
     "storage",
-    "identity", 
-    "tabs",
-    "activeTab"
+    "identity",
+    "tabs"
   ],
-  "background": {"service_worker": "background.js"
-      
-}
+  "background": {
+    "service_worker": "background.js"
+  }
 }

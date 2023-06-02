@@ -52,19 +52,19 @@ chrome.runtime.onMessage.addListener(async ({oper, listToServer}, sendResponse) 
             chrome.runtime.sendMessage({oper:'scanComplited' , my_variable : tg_channel[0]  })
             break;
         }
+        case "Date":{
+            console.log(listToServer)
+            const date_begin = listToServer[0]
+            const date_end = listToServer[1]
+            console.log(date_begin)
+            console.log(date_end)
+            chrome.runtime.sendMessage({oper: 'date', my_variable : date_begin})
+              break;
+            }
+            
         case "Scan_posts":{
            let scan_channel = listToServer
             console.log(scan_channel);
-            // let xhr = new XMLHttpRequest();
-            // xhr.open('GET', 'http://45.136.51.185:4444/');
-            // xhr.send([scan_channel]);
-            // xhr.onload = function() {
-            //     if (xhr.status != 200) { // анализируем HTTP-статус ответа, если статус не 200, то произошла ошибка
-            //       alert(`Ошибка ${xhr.status}: ${xhr.statusText}`); // Например, 404: Not Found
-            //     } else { // если всё прошло гладко, выводим результат
-            //       alert(`Готово, получили ${xhr.response.length} байт`); // response -- это ответ сервера
-            //     }
-            //   };
              // Отправка массива на сервер
             fetch('http://localhost:3000/savedMessage', {
                     method: 'POST',

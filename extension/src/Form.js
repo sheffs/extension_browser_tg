@@ -2,13 +2,19 @@ import React, { useEffect, useState } from "react";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Table from 'react-bootstrap/Table';
+import ru from 'date-fns/locale/ru';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import FormLabel from "react-bootstrap/esm/FormLabel";
 
 var channels = "";
 
 function Searchform() {
   const [counter, setCounter] = useState(0);
   const [selectedChannels, setSelectedChannels] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const local_channels = JSON.parse(localStorage.getItem('selectedChannels'))
   let map = new Map(Object.entries(channels));
   useEffect(() => {
@@ -62,10 +68,21 @@ function Searchform() {
       localStorage.setItem('selectedChannels', JSON.stringify(updatedSelectedChannels));
     };
 
-  const clickButton = () => {
-    chrome.runtime.sendMessage({ oper: 'CheckBox_Channel', listToServer: selectedChannels });
-  }
+    // даты 
+    const handleStartDateChange = (date) => {
+      setStartDate(date);
+    };
+    const handleEndDateChange = (date) => {
+      setEndDate(date);
+    };
 
+  const clickButton = () => {
+    const start_date = startDate ? startDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const end_date= endDate ? endDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+    const date_range = [start_date,end_date]
+    chrome.runtime.sendMessage({oper: 'Date', listToServer: date_range})
+    chrome.runtime.sendMessage({ oper: 'CheckBox_Channel', listToServer: selectedChannels});
+  }
   return (
     <div style={{ margin: "10px" }}>
       <Form>
@@ -73,6 +90,26 @@ function Searchform() {
           <Form.Label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Поиск</Form.Label>
           <Form.Control placeholder="Введите слово или словосочетание" />
         </Form.Group>
+        <Form.Group className="bg-light" style={{ marginBottom: "10px" }}>
+          <Form.Label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Дата начала поиска:</Form.Label>
+          <DatePicker
+            
+            selected={startDate}
+            onChange={handleStartDateChange}
+            dateFormat="dd/MM/yyyy"
+            placeholderText="Выберите дату"
+            locale={ru}
+          />
+          <Form.Label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Дата окончания поиска:</Form.Label>
+          <DatePicker
+            selected={endDate}
+            onChange={handleEndDateChange}
+            dateFormat="dd/MM/yyyy"
+            placeholderText="Выберите дату"
+            locale={ru}
+          />
+      </Form.Group>
+        
         <Button variant="outline-secondary" onClick={clickButton}>
           Поиск
         </Button>
@@ -84,6 +121,7 @@ function Searchform() {
               <th>Статус</th>
             </tr>
           </thead>
+
           <tbody>
             {Array.from(map).map(([key, value]) => (
                 <tr key={key}>

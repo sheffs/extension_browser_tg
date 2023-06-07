@@ -1,3 +1,4 @@
+
 // Получение данных из localStorage
 const data = localStorage.getItem('tt-global-state');
 const parseData = JSON.parse(data)['chats']['byId'];
@@ -15,86 +16,133 @@ chrome.runtime.sendMessage({ oper: 'sendMessageBack', listToServer: channels }, 
 
 
 
+
 // Слушатель сообщений поступающих на content.js
 chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse) => {
   switch(oper){
+    
     case "Scan" : {
       // Получаем текущую дату
-      
+      console.log('Я работаю в case Scan')
+      let date = listToServer
+      let date_low = Date.parse (date[1])
+      let date_high = Date.parse (date[0])
+      console.log( date[0])
+
       const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = currentDate.getMonth() + 1; // добавляем 1, так как месяцы в JavaScript начинаются с 0
-      const day = currentDate.getDate();
-      const currentDateObj = { year, month, day }; // создаем объект с отдельными частями даты
-      const currentDateJson = JSON.stringify(currentDateObj); // конвертируем объект в JSON-строку
-      console.log(currentDateJson);
-
-
-      
-
-    const messageDateGroupElements = document.getElementsByClassName('message-date-group');
-    //Перебираем все элементы коллекции messageDateGroupElements
-    for (let i = 0; i < messageDateGroupElements.length; i++) {
+      const current_date_string = currentDate ? currentDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+      const current_date = Date.parse(current_date_string)
+      console.log(current_date)
+      const messageDateGroupElements = document.getElementsByClassName('message-date-group');
+      //Перебираем все элементы коллекции messageDateGroupElements
+      for (let i = 0; i < messageDateGroupElements.length; i++) {
       const stickyDateElement = messageDateGroupElements[i].querySelector('.sticky-date.interactive');
       if (stickyDateElement) {
         const stickyDateText = stickyDateElement.innerText;
         console.log(stickyDateText);
       }
-    }
-    let posts = []
+      }
+      let posts = []
       let post = document.getElementsByClassName('text-content clearfix with-meta')
       for (let i = 0; i<post.length; i++){
         let text = post[i].innerText
         posts.push(text)
       }
-      console.log(posts)
-    const time_post = document.getElementsByClassName('message-time')
-      for (let i = 0; i<time_post.length; i++){
-        console.log(time_post[i].innerText)
-      }
+      
+      // console.log(posts)
+      const json_posts  = JSON.stringify(posts)
+      // console.log(json_posts)
+      // получаем название открытого канала
+      let names_allchannels = document.getElementsByClassName('title ysHMmXALnn0fgFRc7Bn7')
+      let quantity_channels = names_allchannels.length
+      let value_channel = names_allchannels[quantity_channels-1]
+      let name_channel = value_channel.innerText
+      // получение времени публикации и количества просмотров
+      // const time_post = document.getElementsByClassName('message-time')
+      //   for (let i = 0; i<time_post.length; i++){
+      //     console.log(time_post[i].innerText)
+      //   }
+      // const view_post = document.getElementsByClassName("message-views")
+      // for (let i = 0; i<view_post.length; i++){
+      //   console.log(view_post[i].innerText)
+      // }
+      let targetElement = document.querySelector('.message-date-group');
+      if (targetElement) {
+        let delta_time_low = current_date - date_low
+        let delta_time_high = current_date - date_high
+        let delta_in_days_low = delta_time_low / (1000*3600*24)
+        let delta_in_days_high = (delta_time_high / (1000*3600*24)) // TODO day + 1
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        let sp_low = ""  // data + 1
+        let sp_high = ""       // data + 1
+        if (delta_in_days_low <= 7){
+        let k = (currentDate.getDay() - delta_in_days_low + 7) % 7
+        sp_low = days[k]
+        }
+        else {
+          sp_low  = (date[0].split(','))[0]
+        }
+        if (delta_in_days_low == 1){ sp_low = 'Yesterday'}
+        if(delta_in_days_low == 0){sp_low = 'Today'}
+        if (delta_in_days_high <= 7){
+          let k = (currentDate.getDay() - delta_in_days_high + 7) % 7
+        sp_high = days[k] // TODO day + 1
+        }
+        else {
+          sp_high  = (date[1].split(','))[0] // TODO day + 1
+        }
+        if (delta_in_days_high == 1){ sp_high = 'Yesterday'}
+        if(delta_in_days_high == 0){sp_high = 'Today'}
+        console.log("sp_high: ", sp_high)
+        console.log("sp_low: ", sp_low)
 
-    let targetElement = document.querySelector('.message-date-group');
-
-    if (targetElement) {
-      let sp_from = "Wednesday"  // data + 1
-      let sp_to = "Monday"       // data + 1
       let isSpTo = true          // Костыль
       let isSpFrom = true        // Костыль
         setInterval(function(){
           span_value = targetElement.querySelector('.sticky-date.interactive').innerText
-          if(span_value != sp_from && isSpTo){
+          if(span_value != sp_low && isSpTo){
             targetElement = document.querySelector('.message-date-group');
             targetElement.scrollIntoView({ behavior: 'smooth' });
-            isSpTo = false
           }
-          else if(span_value != sp_to && isSpFrom){
+          else if(span_value != sp_high && isSpFrom){
+            isSpTo = false
             targetElement = document.querySelector('.message-date-group');
-            console.log("СОБИРАЕМ ДАННЫЕ С КАНАЛА")
-            console.log("ОТПРАВЛЯЕМ НА СЕРВЕР")
-            console.log(targetElement)
+            const messageDateGroupElements = document.getElementsByClassName('message-date-group');
+            //Перебираем все элементы коллекции messageDateGroupElements
+            for (let i = 0; i < messageDateGroupElements.length; i++) {
+              const stickyDateElement = messageDateGroupElements[i].querySelector('.sticky-date.interactive');
+              if (stickyDateElement) {
+                const stickyDateText = stickyDateElement.innerText;
+              }
+            }
+            let posts = []
+              let post = document.getElementsByClassName('text-content clearfix with-meta')
+              for (let i = 0; i<post.length; i++){
+                let text = post[i].innerText
+                posts.push(text)
+              }
+              
+              const json_posts  = JSON.stringify(posts)
+              console.log(json_posts)
+            
+            console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+            
+            chrome.runtime.sendMessage({oper: 'Scan_posts', listToServer: posts},function(response) {})
             targetElement.scrollIntoView({ behavior: 'smooth' });
-            isSpFrom = true
+            
           }
           else {
+            isSpFrom = false
+            chrome.runtime.sendMessage({ oper: 'Complited', dateInterval: date});
             return
           }
-        }, 5000);
-  }
-    
-
-      chrome.runtime.sendMessage({oper: 'Scan_posts', listToServer: cleanedArray},function(response) {})
-      setTimeout(()=>{
-        chrome.runtime.sendMessage({ oper: 'Complited'});
-      },5000);
-      
-      break
+        }, 1000);
     }
-    case "date" : {
-      console.log(listToServer)
-      break;
-    }
+    console.log("ОТПРАВЛЯЕМ НА СЕРВЕР")
     
+    break;
+    }
     default: {console.log('def')}
   }
-  
+  return true
 })

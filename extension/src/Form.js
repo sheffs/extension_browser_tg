@@ -6,7 +6,6 @@ import ru from 'date-fns/locale/ru';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import FormLabel from "react-bootstrap/esm/FormLabel";
 
 var channels = "";
 
@@ -80,8 +79,7 @@ function Searchform() {
     const start_date = startDate ? startDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     const end_date= endDate ? endDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
     const date_range = [start_date,end_date]
-    chrome.runtime.sendMessage({oper: 'Date', listToServer: date_range})
-    chrome.runtime.sendMessage({ oper: 'CheckBox_Channel', listToServer: selectedChannels});
+    chrome.runtime.sendMessage({ oper: 'CheckBox_Channel', listToServer: selectedChannels, dateInterval:  date_range});
   }
   return (
     <div style={{ margin: "10px" }}>

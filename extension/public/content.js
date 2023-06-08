@@ -28,7 +28,15 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
       let date_low = Date.parse (date[1])
       let date_high = Date.parse (date[0])
       console.log( date[0])
+      let date_h_utx = new Date(date[0]).getTime() - 86400
+      let date_hh = new Date()
+      date_hh.setTime(date_h_utx)
+      console.log(date_hh)
+      
 
+
+      //let date_1 = date_h.setDate(date[0]).ge
+    
       const currentDate = new Date();
       const current_date_string = currentDate ? currentDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
       const current_date = Date.parse(current_date_string)
@@ -90,6 +98,7 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
         }
         else {
           sp_high  = (date[1].split(','))[0] // TODO day + 1
+
         }
         if (delta_in_days_high == 1){ sp_high = 'Yesterday'}
         if(delta_in_days_high == 0){sp_high = 'Today'}
@@ -115,19 +124,37 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
                 const stickyDateText = stickyDateElement.innerText;
               }
             }
-            let posts = []
+            
+              let names_allchannels = document.getElementsByClassName('title ysHMmXALnn0fgFRc7Bn7')
+              let quantity_channels = names_allchannels.length
+              let value_channel = names_allchannels[quantity_channels-1]
+              let name_channel = value_channel.innerText
               let post = document.getElementsByClassName('text-content clearfix with-meta')
+              const time_post = document.getElementsByClassName('message-time')
+              const view_post = document.getElementsByClassName("message-views")
+              let mass = []
               for (let i = 0; i<post.length; i++){
-                let text = post[i].innerText
-                posts.push(text)
-              }
+                // let text = post[i].innerText
+                // let channelName = 'CNANNEL NAME'
+                // let date_time = 'DATE AND TIME'
+                // let count_view = 'COUNT VISITORS'
+                const dictionary = {
+                  'text': post[i].innerText,
+                  'channelName': name_channel,
+                  'time': time_post[i].innerText,
+                  'date': span_value,
+                  'count_view': view_post[i].innerText
+              };
+              mass.push(dictionary)
               
-              const json_posts  = JSON.stringify(posts)
-              console.log(json_posts)
+ 
+            
+              }
+              chrome.runtime.sendMessage({oper: 'Scan_posts', listToServer: mass},function(response) {})
             
             console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
             
-            chrome.runtime.sendMessage({oper: 'Scan_posts', listToServer: posts},function(response) {})
+            
             targetElement.scrollIntoView({ behavior: 'smooth' });
             
           }
@@ -136,7 +163,7 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
             chrome.runtime.sendMessage({ oper: 'Complited', dateInterval: date});
             return
           }
-        }, 1000);
+        }, 5000);
     }
     console.log("ОТПРАВЛЯЕМ НА СЕРВЕР")
     

@@ -1,4 +1,3 @@
-
 // Получение данных из localStorage
 const data = localStorage.getItem('tt-global-state');
 const parseData = JSON.parse(data)['chats']['byId'];
@@ -25,18 +24,25 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
       // Получаем текущую дату
       console.log('Я работаю в case Scan')
       let date = listToServer
+      console.log('date:',date)
       let date_low = Date.parse (date[1])
-      let date_high = Date.parse (date[0])
-      console.log( date[0])
-      let date_h_utx = new Date(date[0]).getTime() - 86400
-      let date_hh = new Date()
-      date_hh.setTime(date_h_utx)
-      console.log(date_hh)
-      
+      console.log('date_low',date_low)
+      d = new Date()
+      d.setTime(Date.parse (date[0])-86400)
+      let date_high = d.getTime()
+      console.log('date_high',date_high)
+      dd = new Date()
+      dd.setTime(date_high)
+      const day_high = dd.getDate()
+      console.log(day_high)
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ]
+      const month_high = dd.getMonth()
+      console.log('month_high',months[month_high])
 
 
-      //let date_1 = date_h.setDate(date[0]).ge
-    
+
+
+      //const months = ['January ', 'February', 'March ', 'April ', 'May ', 'June ', 'July ', 'August ', 'September ', 'October ', 'November ', 'December ' ]
       const currentDate = new Date();
       const current_date_string = currentDate ? currentDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
       const current_date = Date.parse(current_date_string)
@@ -56,30 +62,13 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
         let text = post[i].innerText
         posts.push(text)
       }
-      
-      // console.log(posts)
-      const json_posts  = JSON.stringify(posts)
-      // console.log(json_posts)
-      // получаем название открытого канала
-      let names_allchannels = document.getElementsByClassName('title ysHMmXALnn0fgFRc7Bn7')
-      let quantity_channels = names_allchannels.length
-      let value_channel = names_allchannels[quantity_channels-1]
-      let name_channel = value_channel.innerText
-      // получение времени публикации и количества просмотров
-      // const time_post = document.getElementsByClassName('message-time')
-      //   for (let i = 0; i<time_post.length; i++){
-      //     console.log(time_post[i].innerText)
-      //   }
-      // const view_post = document.getElementsByClassName("message-views")
-      // for (let i = 0; i<view_post.length; i++){
-      //   console.log(view_post[i].innerText)
-      // }
+     
       let targetElement = document.querySelector('.message-date-group');
       if (targetElement) {
         let delta_time_low = current_date - date_low
         let delta_time_high = current_date - date_high
         let delta_in_days_low = delta_time_low / (1000*3600*24)
-        let delta_in_days_high = (delta_time_high / (1000*3600*24)) // TODO day + 1
+        let delta_in_days_high = Math.round((delta_time_high / (1000*3600*24))) // TODO day + 1
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
         let sp_low = ""  // data + 1
         let sp_high = ""       // data + 1
@@ -88,16 +77,18 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
         sp_low = days[k]
         }
         else {
-          sp_low  = (date[0].split(','))[0]
+          sp_low  = (date[1].split(','))[0]
         }
         if (delta_in_days_low == 1){ sp_low = 'Yesterday'}
         if(delta_in_days_low == 0){sp_low = 'Today'}
         if (delta_in_days_high <= 7){
-          let k = (currentDate.getDay() - delta_in_days_high + 7) % 7
-        sp_high = days[k] // TODO day + 1
+          let k = Math.round((currentDate.getDay() - delta_in_days_high + 7) % 7)
+          sp_high = days[k-1] // TODO day + 1
+          console.log("84: ", sp_high, k, delta_in_days_high)
         }
         else {
-          sp_high  = (date[1].split(','))[0] // TODO day + 1
+          sp_high  = months[month_high] + ' ' + day_high
+          console.log("88: ", sp_high)
 
         }
         if (delta_in_days_high == 1){ sp_high = 'Yesterday'}
@@ -152,7 +143,7 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
               }
               chrome.runtime.sendMessage({oper: 'Scan_posts', listToServer: mass},function(response) {})
             
-            console.log("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
+            console.log("ЗАПИСЫВАЮ -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=")
             
             
             targetElement.scrollIntoView({ behavior: 'smooth' });

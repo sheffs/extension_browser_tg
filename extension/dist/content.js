@@ -24,25 +24,22 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
       // Получаем текущую дату
       console.log('Я работаю в case Scan')
       let date = listToServer
-      console.log('date:',date)
+     
       let date_low = Date.parse (date[1])
-      console.log('date_low',date_low)
+     
       d = new Date()
       d.setTime(Date.parse (date[0])-86400)
       let date_high = d.getTime()
-      console.log('date_high',date_high)
+      
       dd = new Date()
       dd.setTime(date_high)
       const day_high = dd.getDate()
-      console.log(day_high)
+     
       const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ]
       const month_high = dd.getMonth()
-      console.log('month_high',months[month_high])
+     
 
 
-
-
-      //const months = ['January ', 'February', 'March ', 'April ', 'May ', 'June ', 'July ', 'August ', 'September ', 'October ', 'November ', 'December ' ]
       const currentDate = new Date();
       const current_date_string = currentDate ? currentDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
       const current_date = Date.parse(current_date_string)
@@ -84,11 +81,11 @@ chrome.runtime.onMessage.addListener( ({oper, listToServer}, sender,sendResponse
         if (delta_in_days_high <= 7){
           let k = Math.round((currentDate.getDay() - delta_in_days_high + 7) % 7)
           sp_high = days[k-1] // TODO day + 1
-          console.log("84: ", sp_high, k, delta_in_days_high)
+        
         }
         else {
           sp_high  = months[month_high] + ' ' + day_high
-          console.log("88: ", sp_high)
+        
 
         }
         if (delta_in_days_high == 1){ sp_high = 'Yesterday'}

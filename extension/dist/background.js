@@ -1,7 +1,7 @@
 (async () => {
 let userChannel = '';
 let tg_channel = [];
-
+let done_scan = true;
 
 async function reloadTab(newUrl, date){
     let part = newUrl.split('#')
@@ -53,9 +53,12 @@ chrome.runtime.onMessage.addListener(async ({oper, listToServer, dateInterval}, 
         }
         case "Complited":{
             const date_1 = dateInterval
-            console.log('Я работаю case Complited')
             tg_channel.shift()
-            if (tg_channel.length == 0){break}
+            if (tg_channel.length == 0 && done_scan){
+                chrome.tabs.create({ url: "http://127.0.0.1:3000/results" })
+                done_scan = false
+                break
+            }
             else {
                 await reloadTab('https://web.telegram.org/z/#' + tg_channel[0], date_1);
             }
@@ -63,13 +66,9 @@ chrome.runtime.onMessage.addListener(async ({oper, listToServer, dateInterval}, 
             break;
         }
         case "Date":{
-            console.log('Я работаю Date')
             console.log(listToServer)
             const date_begin = listToServer[0]
             const date_end = listToServer[1]
-            console.log("[BACKGROUND DateSend] Получаю даты")
-            console.log(date_begin)
-            console.log(date_end)
             chrome.tabs.query({currentWindow: true}, function (tabs) {
                 tabs.forEach(async function (tab) {
                     if (tab.url.indexOf('telegram') !== -1) {
@@ -81,9 +80,7 @@ chrome.runtime.onMessage.addListener(async ({oper, listToServer, dateInterval}, 
             }
             
         case "Scan_posts":{
-            console.log('Я работаю Scan_posts')
            let scan_channel = listToServer
-            console.log(scan_channel);
              // Отправка массива на сервер
             fetch('http://localhost:3000/savedMessage', {
                     method: 'POST',
